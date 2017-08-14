@@ -1,49 +1,28 @@
+// Copyright 2017 The Chromium Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
 import 'package:flutter/material.dart';
 
+// Uncomment lines 7 and 10 to view the visual layout at runtime.
+//import 'package:flutter/rendering.dart' show debugPaintSizeEnabled;
+
 void main() {
+  //debugPaintSizeEnabled = true;
   runApp(new MyApp());
 }
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    sectionTitle();
-
-    return new MaterialApp(
-      title: "Flutter Demo",
-      theme: new ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: new Scaffold(
-        appBar: new AppBar(
-          title: new Text("Top Lakes"),
-        ),
-        body: new ListView(
-          children: <Widget>[
-            new Image.asset(
-              'images/lake.jpg',
-              width: 600.00,
-              height: 240.0,
-              fit: BoxFit.cover,
-            ),
-            sectionTitle(),
-            buttonSection(context),
-            textSection(context),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget sectionTitle() {
-    return new Container(
+    Widget titleSection = new Container(
       padding: const EdgeInsets.all(32.0),
       child: new Row(
-        children: <Widget>[
+        children: [
           new Expanded(
             child: new Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
+              children: [
                 new Container(
                   padding: const EdgeInsets.only(bottom: 8.0),
                   child: new Text(
@@ -62,53 +41,46 @@ class MyApp extends StatelessWidget {
               ],
             ),
           ),
-          new Icon(
-            Icons.star,
-            color: Colors.red[500],
-          ),
+          new FavoriteWidget(),
         ],
       ),
     );
-  }
 
-  Column buttonColumn(IconData icon, String label, BuildContext context) {
-    Color color = Theme.of(context).primaryColor;
+    Column buildButtonColumn(IconData icon, String label) {
+      Color color = Theme.of(context).primaryColor;
 
-    return new Column(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        new Icon(icon, color: color),
-        new Container(
-          margin: const EdgeInsets.only(top: 8.0),
-          child: new Text(
-            label,
-            style: new TextStyle(
-              fontSize: 12.0,
-              fontWeight: FontWeight.w400,
-              color: color,
+      return new Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          new Icon(icon, color: color),
+          new Container(
+            margin: const EdgeInsets.only(top: 8.0),
+            child: new Text(
+              label,
+              style: new TextStyle(
+                fontSize: 12.0,
+                fontWeight: FontWeight.w400,
+                color: color,
+              ),
             ),
           ),
-        ),
-      ],
-    );
-  }
+        ],
+      );
+    }
 
-  Widget buttonSection(BuildContext context) {
-    return new Container(
+    Widget buttonSection = new Container(
       child: new Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          buttonColumn(Icons.call, 'CALL', context),
-          buttonColumn(Icons.near_me, 'ROUTE', context),
-          buttonColumn(Icons.share, 'SHARE', context),
+          buildButtonColumn(Icons.call, 'CALL'),
+          buildButtonColumn(Icons.near_me, 'ROUTE'),
+          buildButtonColumn(Icons.share, 'SHARE'),
         ],
       ),
     );
-  }
 
-  Widget textSection(BuildContext context) {
-    return new Container(
+    Widget textSection = new Container(
       padding: const EdgeInsets.all(32.0),
       child: new Text(
         '''
@@ -116,6 +88,75 @@ Lake Oeschinen lies at the foot of the Blüemlisalp in the Bernese Alps. Situate
         ''',
         softWrap: true,
       ),
+    );
+
+    return new MaterialApp(
+      title: 'Flutter Demo',
+      home: new Scaffold(
+        appBar: new AppBar(
+          title: new Text('Top Lakes'),
+        ),
+        body: new ListView(
+          children: [
+            new Image.asset(
+              'images/lake.jpg',
+              width: 600.0,
+              height: 240.0,
+              fit: BoxFit.cover,
+            ),
+            titleSection,
+            buttonSection,
+            textSection,
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class FavoriteWidget extends StatefulWidget {
+  @override
+  _FavoriteWidgetState createState() => new _FavoriteWidgetState();
+}
+
+class _FavoriteWidgetState extends State<FavoriteWidget> {
+  bool _isFavorite = true;
+  int _favoriteCount = 41;
+
+  void _toggleFavorite() {
+    setState(() {
+      if (_isFavorite) {
+        _favoriteCount -= 1;
+        _isFavorite = false;
+      } else {
+        _favoriteCount += 1;
+        _isFavorite = true;
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return new Row(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        new Container(
+          padding: new EdgeInsets.all(0.0),
+          child: new IconButton(
+              icon: (_isFavorite
+              ? new Icon(Icons.star)
+              : new Icon(Icons.star_border)),
+              color: Colors.red[500],
+              onPressed: _toggleFavorite
+          ),
+        ),
+        new SizedBox(
+          width: 18.0,
+          child: new Container(
+            child: new Text('$_favoriteCount'),
+          ),
+        )
+      ],
     );
   }
 }
